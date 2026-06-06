@@ -6,7 +6,9 @@
   "description": "Lumen — a demo storefront monitored by Capsule. Crashes are auto-captured; the AI agent opens fix-PRs against this repo.",
   "scripts": {
     "start": "tsx src/server.ts",
-    "dev": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "dev:auto": "bash scripts/dev-auto.sh",
+    "refresh": "git pull --ff-only",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
