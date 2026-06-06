@@ -22,7 +22,7 @@ export function checkout(products: Product[], items: CartItem[]): Receipt {
   const lines = items.map((item) => {
     const product = byId.get(item.productId);
     if (!product) {
-      throw new Error(`Cart references missing product ${item.productId}`);
+      return null;  // Skip missing products  
     }
     return {
       productId: product.id,
@@ -30,6 +30,6 @@ export function checkout(products: Product[], items: CartItem[]): Receipt {
       qty: item.qty,
       subtotal: product.price * item.qty,
     };
-  });
+  }).filter(line => line !== null) as Array<{ productId: string; name: string; qty: number; subtotal: number }>;
   return { total: lines.reduce((sum, l) => sum + l.subtotal, 0), lines };
 }
