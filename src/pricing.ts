@@ -9,9 +9,13 @@
  * digits) and reject unknown codes, instead of feeding NaN into the total.
  */
 export function applyPromo(subtotal: number, code: string): number {
-  const percent = parseInt(code, 10); // NaN for "SAVE20"
+  const matches = code.match(/\d+/);
+  const percent = matches ? parseInt(matches[0], 10) : NaN; // Extract numeric part
+  if (isNaN(percent)) {
+    throw new Error(`Promo code "${code}" is invalid.`);
+  }
   const discount = subtotal * (percent / 100);
-  const total = subtotal - discount; // NaN
+  const total = subtotal - discount;
   if (!(total >= 0)) {
     throw new Error(`Promo "${code}" produced an invalid order total: ${total} (NaN)`);
   }
