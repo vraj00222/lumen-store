@@ -5,6 +5,8 @@ import { extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { db } from './db';
 import { checkout, type CartItem } from './checkout';
+import { applyPromo } from './pricing';
+import { searchProducts } from './search';
 import { guard, reportError, approvals } from './capsule-client';
 
 /**
@@ -69,8 +71,46 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
         url: '/api/checkout',
         body: { cartId: 'c1', card: '4111111111111111' },
         tables: db.tables,
+        fixFile: 'src/checkout.ts',
       });
       return sendJson(res, 200, { ok: true, receipt });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: (err as Error).message });
+    }
+  }
+
+  // Real bug #2: promo code math (src/pricing.ts) — "SAVE20" parses to NaN.
+  if (path === '/api/promo' && method === 'POST') {
+    const body = (await readBody(req)) as { code?: string; items?: CartItem[] };
+    const code = body.code ?? 'SAVE20';
+    const items = body.items?.length ? body.items : defaultCart;
+    try {
+      const products = await db.products();
+      const byId = new Map(products.map((p) => [p.id, p]));
+      const subtotal = items.reduce((s, it) => s + (byId.get(it.productId)?.price ?? 0) * it.qty, 0);
+      const total = await guard(() => applyPromo(subtotal, code), {
+        url: '/api/promo',
+        body: { code },
+        tables: db.tables,
+        fixFile: 'src/pricing.ts',
+      });
+      return sendJson(res, 200, { ok: true, subtotal, total, code });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: (err as Error).message });
+    }
+  }
+
+  // Real bug #3: search compiles user input as a RegExp (src/search.ts).
+  if (path === '/api/search' && method === 'GET') {
+    const q = url.searchParams.get('q') ?? '';
+    try {
+      const products = await db.products();
+      const results = await guard(() => searchProducts(products, q), {
+        url: `/api/search?q=${q}`,
+        tables: db.tables,
+        fixFile: 'src/search.ts',
+      });
+      return sendJson(res, 200, { ok: true, results });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: (err as Error).message });
     }

@@ -14,6 +14,8 @@ interface GuardCtx {
   url: string;
   body?: unknown;
   tables: Tables;
+  /** Repo-relative source file responsible — so Capsule's agent fixes the right file. */
+  fixFile?: string;
 }
 
 export async function guard<T>(fn: () => T | Promise<T>, ctx: GuardCtx): Promise<T> {
@@ -40,6 +42,7 @@ async function report(err: Error, ctx: GuardCtx): Promise<void> {
         },
         session: { userId: 'u1', token: 'sek_live_9f2c1d' },
         tables: await ctx.tables(),
+        fixFile: ctx.fixFile,
       }),
     });
   } catch {

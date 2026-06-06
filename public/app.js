@@ -149,6 +149,36 @@ async function run(scenario) {
 }
 $$('[data-run]').forEach((b) => b.addEventListener('click', () => run(b.dataset.run)));
 
+// Real bug: apply a promo code (server: src/pricing.ts).
+$('[data-promo]').addEventListener('click', async () => {
+  const code = $('#promo').value || 'SAVE20';
+  try {
+    const res = await fetch('/api/promo', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code, items: cart }),
+    });
+    const data = await res.json();
+    if (data.ok) toast(`✅ ${code} applied — total $${data.total}`, 'ok');
+    else friendlyError(data.capsuleId);
+  } catch {
+    friendlyError();
+  }
+});
+
+// Real bug: search the catalog (server: src/search.ts).
+$('[data-search]').addEventListener('click', async () => {
+  const q = $('#search').value;
+  try {
+    const res = await fetch('/api/search?q=' + encodeURIComponent(q));
+    const data = await res.json();
+    if (data.ok) toast(`Found ${data.results.length} result(s) for "${q}"`, 'ok');
+    else friendlyError(data.capsuleId);
+  } catch {
+    friendlyError();
+  }
+});
+
 async function discontinue(id, btn) {
   await fetch('/api/admin/discontinue/' + id, { method: 'POST' });
   toast(`Discontinued ${NAMES[id] || id}`, 'ok', 'Removed from the live catalog.');
