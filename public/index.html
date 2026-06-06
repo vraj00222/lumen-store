@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lumen — everyday essentials</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script src="/capsule-client.js" defer></script>
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="nav__brand">◐ Lumen</div>
+      <nav class="nav__links">
+        <button class="nav__link is-active" data-view="shop">Shop</button>
+        <button class="nav__link" data-view="account">Account</button>
+        <button class="nav__link" data-view="admin">Admin</button>
+      </nav>
+      <button class="nav__cart" data-cart-toggle>🛒 Cart <span class="nav__count" data-cart-count>0</span></button>
+    </header>
+
+    <!-- SHOP -->
+    <main class="view is-active" id="view-shop">
+      <section class="hero">
+        <div>
+          <h1>Everyday essentials, beautifully made.</h1>
+          <p>Free shipping over $50 · 30-day returns</p>
+        </div>
+        <button class="btn btn--ghost" data-giftfinder>✨ Gift finder</button>
+      </section>
+      <div class="grid" id="products">loading the catalog…</div>
+    </main>
+
+    <!-- ACCOUNT -->
+    <main class="view" id="view-account">
+      <h2 class="view__title">Your account</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Create an account</h3>
+          <input class="input" id="su-name" placeholder="Full name" />
+          <input class="input" id="su-email" placeholder="Email" />
+          <button class="btn" data-run="signup">Create account</button>
+          <p class="muted">Tip: leave email blank to see a validation error.</p>
+        </div>
+        <div class="card">
+          <h3>Order history</h3>
+          <p class="muted">See your past orders and track shipments.</p>
+          <button class="btn" data-run="orders">View my orders</button>
+        </div>
+        <div class="card">
+          <h3>Wishlist</h3>
+          <p class="muted">Items you saved for later.</p>
+          <button class="btn" data-run="wishlist">Open wishlist</button>
+        </div>
+        <div class="card">
+          <h3>Promo code</h3>
+          <input class="input" id="promo" placeholder="e.g. WELCOME10" value="WELCOME10" />
+          <button class="btn" data-run="promo">Apply code</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ADMIN -->
+    <main class="view" id="view-admin">
+      <h2 class="view__title">Admin · catalog</h2>
+      <p class="muted">Manage the live catalog. Discontinuing a product removes it from the database.</p>
+      <table class="admin">
+        <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+        <tbody id="admin-rows"></tbody>
+      </table>
+      <div class="admin__ops">
+        <button class="btn" data-restock>↺ Restock catalog</button>
+        <button class="btn" data-run="sync">Sync inventory</button>
+        <button class="btn" data-run="importcsv">Import products CSV</button>
+        <button class="btn" data-run="report">Open sales report</button>
+        <button class="btn" data-run="refund">Refund an order</button>
+      </div>
+    </main>
+
+    <!-- CART DRAWER -->
+    <aside class="drawer" id="drawer">
+      <div class="drawer__head">
+        <h3>Your cart</h3>
+        <button class="drawer__x" data-cart-toggle>✕</button>
+      </div>
+      <div id="cart-items" class="drawer__items"></div>
+      <div class="drawer__foot">
+        <div class="drawer__total">Total <span id="cart-total">$0</span></div>
+        <button class="btn btn--primary btn--full" data-checkout>Checkout</button>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <div class="toasts" id="toasts"></div>
+  </body>
+</html>
