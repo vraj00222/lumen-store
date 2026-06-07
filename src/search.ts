@@ -11,6 +11,7 @@ import type { Product } from './db';
  * plain case-insensitive substring.
  */
 export function searchProducts(products: Product[], query: string): Product[] {
-  const re = new RegExp(query, 'i');
+  const escapedQuery = query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const re = new RegExp(escapedQuery, 'i');
   return products.filter((p) => re.test(p.name));
 }
